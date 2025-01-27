@@ -1,0 +1,4 @@
+Following the trends it can become apperant that the the graph might not accurately capture the earlier value.
+Given that the model is done by polynomials, it is expected that the value will quickly deteriorate from points far
+away from the known points. 
+This becomes apart as a growth factor x^3 is very strong.
