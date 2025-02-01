@@ -1,4 +1,3 @@
-Following the trends it can become apperant that the the graph might not accurately capture the earlier value.
-Given that the model is done by polynomials, it is expected that the value will quickly deteriorate from points far
-away from the known points. 
-This becomes apart as a growth factor x^3 is very strong.
+Following the trends it becomes apparent that the graph will not accurately capture the earlier value at 1970.
+Given that the model is of polynomials, it is expected that the value will quickly deteriorate from points far
+away from the known points, this becomes apart as a growth factor x^3 quickly outgrows its friends (smaller polynomials).
