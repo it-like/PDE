@@ -61,11 +61,11 @@ def pi_interpolation(list_of_pols, cor_y_vals):
 
 
 
-x_vals = [1,2,3]
-y_vals = [1,4,2]
-np_poly_coeffs = np.polyfit(x_vals, y_vals, 2)
+x_vals = [1,2,3,5]
+y_vals = [1,4,2,6]
+np_poly_coeffs = np.polyfit(x_vals, y_vals, 3)
 np_poly = np.poly1d(np_poly_coeffs)
-all_polys = lagrange_lambdas([1,2,3])
+all_polys = lagrange_lambdas(x_vals)
 
 
 '''individual L_i plots'''
@@ -85,11 +85,11 @@ def compute_error_between_pols(pol_1, pol_2, interval, n=1000):
     diff = pol_1(x_mid) - pol_2(x_mid)
     return np.sqrt(dx * np.sum(diff**2)) # sums ups the squared error error
 
-error = compute_error_between_pols(ans,np_poly, [1,3])
+error = compute_error_between_pols(ans,np_poly, [1,6])
 
 
-lin_x_vals = np.linspace(0,4,1000)
-plt.axis([0.5,3.5,-1,4.5])
+lin_x_vals = np.linspace(0,7,1000)
+plt.axis([0.5,9,-1,7])
 for i, poly in enumerate(all_polys):
     plt.plot(lin_x_vals, poly(lin_x_vals), label=f'$l_{i}(x)$')
 plt.grid(True)
@@ -100,6 +100,7 @@ plt.plot(lin_x_vals, ans(lin_x_vals), label=f'$Predicted$',linestyle='-', c='gre
 plt.plot(lin_x_vals, np_poly(lin_x_vals), label=f'$True$',linestyle='dashed',c='black')
 plt.legend()
 plt.title(f'Error between estimated and true is {error:.2e}.')
-plt.savefig('assignment1/photos/task3.png')
+plt.show()
+#plt.savefig('assignment1/photos/task3.png')
 
 
