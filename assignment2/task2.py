@@ -13,12 +13,8 @@ def create_midpoints(bounds: list, intervals: int):
     for _ in range(intervals):
         sum_result += test_function((step + h/2))
         step += h
-    print(sum_result * h)  
+    return sum_result * h
 
-print(polynom)
-print((np.e - 2)/2)
-create_midpoints([0,1],100000)
-#plt.grid(True)
-#plt.plot(x_vals, polynom(x_vals))
-#plt.axis([-4,4,-4,4])
-#plt.show()
+real = (np.e - 2)/2
+approx = create_midpoints([0,1],100)
+print(np.format_float_scientific(real-approx,5))
