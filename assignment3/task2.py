@@ -1,52 +1,42 @@
-#Task 2
 import matplotlib.pyplot as plt
 import numpy as np
 
-epsSTUD = 17e-3
+eps_stud = 17e-3
+lam = 0.005 * eps_stud
+beta = 0.01
+zeta = 0.02
 
-H = 500
-Z = 10
-R = 0
+def system_deriv(state, t):
+    H, Z, R = state
+    dH = -beta * H * Z
+    dZ = beta * H * Z + zeta * R - lam * H * Z
+    dR = lam * H * Z - zeta * R
+    return np.array([dH, dZ, dR])
+step_sizes = [0.65, 0.1]
 
-#b)
-λ = 0.005*epsSTUD
-β = 0.01
-ζ = 0.02
-
-R_0 = 0
-h = [.65, .1, .001]
-def dH(t): return -β * H*Z
-def dZ(t): return β*H*Z + ζ*R - λ*H*Z
-def dR(t): return λ*H*Z - ζ*R
-
-def system_next(t, h):
-    global H
-    global Z
-    global R
-
-    H = dH(t)*h + H
-    Z = dZ(t)*h + Z
-    R = dR(t)*h + R
-
-for _h in h:
-    H = 500
-    Z = 10
-    R = 0
-
-    tvals = []
-    hvals = []
-    zvals = []
-    rvals = []
-
-    n = 10 / _h
-    for i in range(int(n)):
-        system_next(i*_h, _h)
-        tvals.append(i*_h)
-        hvals.append(H)
-        zvals.append(Z)
-        rvals.append(R)
-
-    plt.plot(tvals, hvals, c='red')
-    plt.plot(tvals, zvals, c='green')
-    plt.plot(tvals, rvals, c='blue')
+for dt in step_sizes:
+    t_max = 10
+    n_steps = int(t_max / dt) # float for dt = 0.65
+    tvals = np.linspace(0, t_max, n_steps + 1)
+    state = np.array([500, 5, 0]) # initial values 500 humans, 5 zombies
+    
+    Hvals, Zvals, Rvals = [state[0]], [state[1]], [state[2]]
+    
+    for i in range(n_steps):
+        state = state + dt * system_deriv(state, tvals[i])
+        Hvals.append(state[0])
+        Zvals.append(state[1])
+        Rvals.append(state[2])
+        print(state[0])
+        print(state[1])
+        print(state[2])
+    plt.figure(figsize=[12,8])
+    plt.grid(True)
+    plt.plot(tvals, Hvals, c='green', label='Humans')
+    plt.plot(tvals, Zvals, c='red', label='Zombies')
+    plt.plot(tvals, Rvals, c='grey', label='Removed')
+    plt.xlabel('Time')
+    plt.ylabel('Population')
+    plt.title(f'Euler scheme with h = {dt}')
+    plt.legend()
     plt.show()
