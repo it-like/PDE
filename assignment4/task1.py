@@ -122,10 +122,7 @@ def run_experiments():
     plt.savefig("assignment4/images/Pe_approx.svg", format="svg")
     exit()
 
-import collections.Counter as Counter
-tiles = 'abvc'
-count = Counter(tiles)
-print(tiles)
+
 if __name__ == "__main__":
     D = 1
     M = 12
