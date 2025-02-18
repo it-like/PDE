@@ -2,28 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def fem_conv_diff(D, m):
-    """
-    Solve the 1D convection-diffusion problem:
-        -D u''(x) + beta u'(x) = 1,  for x in (0, pi),
-    with Dirichlet boundary conditions u(0)=0, u(pi)=0,
-    using a uniform mesh of m+1 elements and CG(1) finite elements.
-    
-    Parameters
-    ----------
-    D : float
-        Diffusion coefficient (positive).
-    beta : float
-        Convection coefficient in front of u'(x).
-    m : int
-        Number of subintervals minus 1. The mesh has (m+1) subintervals.
-    
-    Returns
-    -------
-    x : numpy.ndarray
-        Array of mesh node coordinates (size m+2).
-    U : numpy.ndarray
-        The finite element solution at each mesh node (size m+2).
-    """
     
     a = 0.0
     b = np.pi
@@ -70,11 +48,13 @@ def fem_conv_diff(D, m):
     # Overwrite row 0
     
     A[0, :] = 0
+    A[:, 0] = 0
     A[0, 0] = 1 # Force U(0) = 0 
     F[0] = 0    # By AU_0 = F_0 => U_0 = 0
     
     # Overwrite row m+1
     A[m+1, :] = 0
+    A[:, m+1] = 0
     A[m+1, m+1] = 1 # Force U(1) = 0 
     F[m+1] = 0      # By AU_{m+1} = F_{m+1} => U# By AU = F => U = 0 
     # Solve linear system
@@ -87,16 +67,21 @@ def exact_solution(D, x):
 
 
 def compute_error(D, M):
-    x, u_fem = fem_conv_diff(D, M)
-
-    u_ex = exact_solution(D, x)
+    x_coarse, u_fem = fem_conv_diff(D, M)
     
-    # Quick discrete approximation we just do the sum*(h).
-    h = np.pi / M
-    return np.sqrt( np.sum((u_fem - u_ex)**2) * h )
+    N_fine = 10000
+    x_fine = np.linspace(0, np.pi, N_fine)
+    
+    
+    u_ex_fine = exact_solution(D, x_fine)
+    
+    u_fem_interp = np.interp(x_fine, x_coarse, u_fem)
+    h_fine = (np.pi - 0) / (N_fine - 1)
+    error = np.sqrt(np.sum((u_fem_interp - u_ex_fine)**2) * h_fine)
+    return error
 
 def run_experiments():
-    Ds = [1, 0.01]
+    Ds = [np.round(np.pi/2,4), 0.01]
     Ms = np.arange(100)
 
     results = {}
@@ -119,13 +104,14 @@ def run_experiments():
     plt.xscale('log')
     plt.yscale('log')
     plt.grid(True)
-    plt.savefig("assignment4/images/Pe_approx.svg", format="svg")
-    exit()
+    #plt.savefig("assignment4/images/Pe_approx.svg", format="svg")
+    plt.show()
+    
 
 
 if __name__ == "__main__":
-    D = 1
-    M = 12
+    D = 0.01
+    M = 500
     x, U= fem_conv_diff(D, M)
     print(np.round(U,3))
 
@@ -141,3 +127,4 @@ if __name__ == "__main__":
     #plt.savefig("assignment4/images/mesh_12_D_1.svg", format="svg")
     plt.show()
     run_experiments()
+    
