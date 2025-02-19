@@ -63,7 +63,7 @@ def fem_conv_diff(D, m):
     return x, U
 
 def exact_solution(D, x):
-    return (2*np.pi / (np.exp(np.pi/(2*D)) - 1)) * (1 - np.exp(x/(2*D))) + 2*x
+    return (2*np.pi / (np.exp(np.pi/(2*D)) - 1)) * (1 - np.exp(x/(2*D))) + 2*x  
 
 
 def compute_error(D, M):
@@ -110,8 +110,8 @@ def run_experiments():
 
 
 if __name__ == "__main__":
-    D = 0.01
-    M = 500
+    D = 1
+    M = 12
     x, U= fem_conv_diff(D, M)
     print(np.round(U,3))
 
@@ -119,12 +119,13 @@ if __name__ == "__main__":
     x_fine = np.linspace(0, np.pi, 3000)
     u_exact = exact_solution(D, x_fine)
     plt.figure()
+    plt.grid(True)
     plt.plot(x_fine, u_exact, 'k-', label='Exact solution')
     plt.plot(x, U, 'ro-', label='FEM solution')
     plt.xlabel('x')
     plt.ylabel('u(x)')
     plt.legend()
-    #plt.savefig("assignment4/images/mesh_12_D_1.svg", format="svg")
+    plt.savefig("assignment4/images/mesh_12_D_1.svg", format="svg")
     plt.show()
     run_experiments()
     

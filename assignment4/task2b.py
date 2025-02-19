@@ -4,6 +4,9 @@ import matplotlib.pyplot as plt
 def f(x):
     return (np.pi**2) * np.sin(np.pi * x)
 
+def exact_solution(x):
+    return np.sin(np.pi * x)
+
 def fem_solver(m):
     a, b = 0.0, 1.0
     h = (b - a) / (m + 1)
@@ -18,6 +21,7 @@ def fem_solver(m):
         A[i,j] += K_diff[0,1]
         A[j,i] += K_diff[1,0]
         A[j,j] += K_diff[1,1]
+
         F[i] += 0.5 * (x[j] - x[i]) * f(x[i])
         F[j] += 0.5 * (x[j] - x[i]) * f(x[j])
     A[0,:] = 0
@@ -29,54 +33,40 @@ def fem_solver(m):
     U = np.linalg.solve(A, F)
     return x, U
 
-def compute_error_on_fine_grid(x_coarse, U_coarse, exact_fun, num_fine_points=2001):
-    x_fine = np.linspace(x_coarse[0], x_coarse[-1], num_fine_points)
-    U_fine = np.interp(x_fine, x_coarse, U_coarse)
-    U_exact_fine = exact_fun(x_fine)
-    diff = U_fine - U_exact_fine
-    L2_error = np.sqrt(np.trapz(diff**2, x_fine))
-    return L2_error
-
-def main():
-    exact_sol = lambda xx: np.sin(np.pi * xx)
-    L_values = [1, 2, 3, 4, 5]
-    hs = []
-    errors = []
-    for L in L_values:
-        m = 2**L
-        x_coarse, U_coarse = fem_solver(m)
-        e = compute_error_on_fine_grid(x_coarse, U_coarse, exact_sol)
-        h = 1.0 / (m + 1)
-        hs.append(h)
-        errors.append(e)
-        print(m)
-    
-    plt.loglog(hs, errors, 'o--')
-    plt.xlabel("h")
-    plt.ylabel("Error")
-    plt.grid(True)
-    p_coeff = np.polyfit(np.log(hs), np.log(errors), 1)
-    p_est = p_coeff[0]
-    plt.text(hs[len(hs)//2], errors[len(hs)//2], f"Order ~ {p_est:.2f}", fontsize=12, color='red')
-    plt.show()
-
-
-    
-
 if __name__ == "__main__":
-    m = 1100
-    broken_for_exact = np.arange(0,1,0.00001)
-    x, U = fem_solver(m)
-    u_exact = np.sin(np.pi * broken_for_exact)  # exact solution
+
     
-    plt.figure(figsize=(12,9))
-    plt.plot(broken_for_exact, u_exact, 'k-', label='Exact $u(x)=\sin(\pi x)$')
-    plt.plot(x, U, 'ro--', label='FEM cG(1) solution')
-    plt.xlabel('x')
-    plt.ylabel('u(x)')
-    plt.legend()
+    mesh_sizes = [2**i for i in range(6) if i >=1 ] # 1,2,3,4,5 for each: 2^each
+    print(mesh_sizes)
+
+    errors = []
+    H = []
+    
+    for m in mesh_sizes:
+        x, U = fem_solver(m)
+    
+        U_exact = exact_solution(x)
+        # max norm between lines
+        err = np.max(np.abs(U - U_exact))
+        h = 1.0 / (m+1) # Step size
+        
+        errors.append(err)
+        
+        H.append(h) 
+        
+        print(f"m = {m}, h = {h:.2e}, error = {err:.2e}") # plots latest occurance of error by [-1]
+
+
+    plt.figure()
     plt.grid(True)
-    plt.title('FEM cG(1) Approximation for 1D Poisson Problem')
-    plt.show()
-    main()
+    plt.loglog(H, errors, 'o-', label='FEM error')
     
+    C = errors[0] / (H[0]**2)
+    plt.loglog(H, [C * (h**2) for h in H], 'r--', label=r"~ $Ch^2$")
+
+    plt.xlabel('h')
+    plt.ylabel('Error')
+    plt.legend()
+    plt.title(r"Convergence of 1D FEM for $-u''(x) = \pi^2 \sin(\pi x)$")
+    plt.savefig("assignment4/images/cg1_error.svg", format="svg")
+    plt.show()
