@@ -44,7 +44,9 @@ def fem_conv_diff(D, m):
 
     
     # Impose Dirichlet boundary conditions: u(0)=0, u(pi)=0:
-
+    print(len(A))
+    print(len(x))
+    exit()
     # Overwrite row 0
     
     A[0, :] = 0
