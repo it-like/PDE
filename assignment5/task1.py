@@ -26,7 +26,6 @@ def assemble_matrices(m, h):
      
     for e in range(N-1):
         indices = [e, e + 1] # Local left and right hat functions
-        
         M_e = (h/6) * np.array([[2, 1],
                                 [1, 2]])
         
