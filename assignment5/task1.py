@@ -95,6 +95,7 @@ xi = np.zeros(m+2)
 
 sol_time = [xi.copy()]
 time_vec = [0.0]
+
 '''Backward Euler scheme'''
 # Rearranged approximation, equation 12
 for l in range(1, n_time+1): # start at 1, 0 already done from above
